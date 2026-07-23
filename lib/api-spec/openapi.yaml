@@ -1,0 +1,162 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: analyze
+    description: Trust analysis operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /analyze:
+    post:
+      operationId: analyzeContent
+      tags: [analyze]
+      summary: Analyze content for trust signals
+      description: Analyzes submitted content and returns a structured trust score with risk assessment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalysisInput"
+      responses:
+        "200":
+          description: Analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalysisResult"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /analyze/examples:
+    get:
+      operationId: getAnalysisExamples
+      tags: [analyze]
+      summary: Get example content presets
+      description: Returns hard-coded example content for each content type, useful for demos
+      responses:
+        "200":
+          description: List of examples
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnalysisExample"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    AnalysisInput:
+      type: object
+      properties:
+        content:
+          type: string
+          description: The text content to analyze
+        content_type:
+          type: string
+          enum: [message, job_ad, url, email, contract]
+          description: The type of content being analyzed
+        input_mode:
+          type: string
+          enum: [text, url, pdf]
+          description: How the content was provided
+      required:
+        - content
+        - content_type
+        - input_mode
+    AnalysisResult:
+      type: object
+      properties:
+        trust_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Trust score from 0 (no trust) to 100 (fully trusted)
+        risk:
+          type: string
+          enum: [Low, Medium, High]
+          description: Risk level derived from trust score
+        red_flags:
+          type: array
+          items:
+            type: string
+          description: List of detected red flag signals
+        explanation:
+          type: string
+          description: Human-readable explanation of the analysis
+        recommendation:
+          type: string
+          description: Actionable recommendation for the user
+        suggested_action:
+          type: string
+          enum: [safe, verify, ignore]
+          description: Suggested action to take
+        analysis_time_ms:
+          type: integer
+          description: Time taken to perform the analysis in milliseconds
+      required:
+        - trust_score
+        - risk
+        - red_flags
+        - explanation
+        - recommendation
+        - suggested_action
+        - analysis_time_ms
+    AnalysisExample:
+      type: object
+      properties:
+        content_type:
+          type: string
+          enum: [message, job_ad, url, email, contract]
+        label:
+          type: string
+        sample_content:
+          type: string
+        expected_risk:
+          type: string
+          enum: [Low, Medium, High]
+      required:
+        - content_type
+        - label
+        - sample_content
+        - expected_risk
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+      required:
+        - error

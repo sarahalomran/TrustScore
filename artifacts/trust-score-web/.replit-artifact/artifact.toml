@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Digital Trust Score"
+version = "1.0.0"
+id = "artifacts/trust-score-web"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23299
+
+[services.development]
+run = "pnpm --filter @workspace/trust-score-web run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/trust-score-web", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/trust-score-web/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23299"
+BASE_PATH = "/"

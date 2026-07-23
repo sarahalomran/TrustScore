@@ -42,6 +42,17 @@ The platform supports both Arabic and English, making cybersecurity guidance mor
 - Llama 3.3-70B
 - Groq API
 - OpenAI SDK
+  
+## Screenshots
+
+### Home Page
+![Home Page](images/home.jpg)
+
+### Analysis Process
+![Analysis Process](images/analysis.jpg)
+
+### Result
+![Result](images/result.jpg)
 
 ## Project Goal
 
